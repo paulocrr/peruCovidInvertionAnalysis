@@ -17,3 +17,4 @@ if __name__ == '__main__':
     visualizator.get_contract_chronopleth()
     visualizator.get_entities_provider_arc_map()
     visualizator.entities_provider_with_debt_arc_map()
+    visualizator.generate_coactive_csv()
