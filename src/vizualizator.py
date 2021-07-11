@@ -187,7 +187,7 @@ class Visualizator(DatabaseSettings):
         plt.bar(x_pos, y_axis)
         plt.xlabel("Compañia")
         plt.ylabel("Cantidad de contratos")
-        plt.title("Cantidad de contratos realizados por compañia")
+        plt.title("Cantidad de contratos requeridos por entidad")
         plt.xticks(x_pos, x_axis)
         plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
         plt.savefig('entities_with_more_contracts.png')
@@ -241,10 +241,10 @@ class Visualizator(DatabaseSettings):
         plt.bar(x_pos, y_axis)
         plt.xlabel("Rubro")
         plt.ylabel("Monto")
-        plt.title("Top 11 de rubos con mas inversión")
+        plt.title("Top 10 de rubos con mas inversión")
         plt.xticks(x_pos, x_axis)
         plt.setp(plt.gca().get_xticklabels(), rotation=30, horizontalalignment='right')
-        plt.savefig('top_11_of_headers.png')
+        plt.savefig('top_10_of_headers.png')
         plt.show()
 
     @staticmethod
