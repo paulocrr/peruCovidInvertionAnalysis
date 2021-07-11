@@ -3,6 +3,11 @@ main{
     margin-top: 50px;
 }
 
+table{
+    text-align: center;
+    margin: auto;
+}
+
 .image-chart{
     margin: 0 auto;
     display: block;
