@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Análsis de las Inversiones Hechas por el estado durante la pandemia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/styles/default.min.css">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Metodología del Análisis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                      <a class="nav-link active" aria-current="page" href="#data">Datos</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Metodología
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#clean-data">Limpieza de la data</a></li>
+                            <li><a class="dropdown-item" href="#geographic-data">Obtener Datos Geográficos</a></li>
+                            <li><a class="dropdown-item" href="#legal-rep">Obtener Representates Legales</a></li>
+                            <li><a class="dropdown-item" href="#visualization">Visualización</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#results">Conclusiones</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main data-bs-spy="scroll">
+        <h1 id="data" class="text-center">1. Datos</h1>
+        <p>
+          La data utilizada para generar toda la base de datos y las visualizaciones puede ser descargada en el siguiente
+          <a href="https://drive.google.com/drive/folders/1YZlZA9h_tkvDa7vExp1vM5eTrE7d8WRW?usp=sharing">aqui</a>.
+
+          El conjunto de datos de las empresas empadronadas en la sunat posee los siguientes campos:
+        </p>
+        <ul>
+            <li>Ruc</li>
+            <li>Razon Social</li>
+            <li>Estado del contribuyente</li>
+            <li>Condicion de domicilio</li>
+            <li>Ubigeo</li>
+            <li>Tipo de via</li>
+            <li>Nombre de via</li>
+            <li>Codigo de zona</li>
+            <li>Tipo de zona</li>
+            <li>Numero</li>
+            <li>Interior</li>
+            <li>Lote</li>
+            <li>Departamento</li>
+            <li>Manzana</li>
+            <li>Kilometro</li>
+        </ul>
+        <p>
+          El conjunto de datos que contiene los contratos realizados para convatir la pandemia posee la siguiente
+          información
+        </p>
+        <ul>
+            <li>Codigo de la entidad</li>
+            <li>Ruc de la entidad</li>
+            <li>Entidad</li>
+            <li>Departamento de la entidad</li>
+            <li>Provincia de la entidad</li>
+            <li>Distrito de la entidad</li>
+            <li>Fecha del contrato</li>
+            <li>Objeto Contractual</li>
+            <li>Proceso</li>
+            <li>Codigo de convocatoria</li>
+            <li>Descripcion del proceso</li>
+            <li>Numero de items</li>
+            <li>Producto</li>
+            <li>Sector</li>
+            <li>Ruc del proveedor</li>
+            <li>Proveedor</li>
+            <li>Rubro del proveedor</li>
+            <li>Departamento del proveedor</li>
+            <li>Provincia del proveedor</li>
+            <li>Distrito del proveedor</li>
+        </ul>
+        <p>
+            Por último el conjunto de datos de las elecciones nos dara una idea mas actualizada de la cantidad de
+            personas ue habitan en un departamento. Este conjunto de datos tiene los siguientes campos
+        </p>
+        <ul>
+            <li>Ubigeo</li>
+            <li>Departamento</li>
+            <li>Provincia</li>
+            <li>Distrito</li>
+            <li>Tipo de elección</li>
+            <li>Mesa de Votación</li>
+            <li>Estado del acta</li>
+            <li>Electores validos</li>
+            <li>Electores habiles</li>
+            <li>Votos por peru libre</li>
+            <li>Votos por fuerza popular</li>
+            <li>Votos en blanco</li>
+            <li>Votos en nulos</li>
+            <li>Votos impugnados</li>
+        </ul>
+        <hr />
+        <h1 class="text-center">2. Metodología</h1>
+        <h2 id="clean-data">2.1. Limpiar Datos</h2>
+        <p>
+          Debido a que ambos conjuntos de datos mencionados en la seccion anterior tienen un tamaño conciderable se les
+          parseo para poder introducirlos a una la base de datos NoSQL <a href="https://www.mongodb.com/es">MongoDB</a>,
+          para asi tener los datos indexados y poder crear diferentes colecciones dependiendo de las visualizaciones que se
+          han creado, esto tambien permite que la data pueda ser actualizada y consultada de una manera rapida. Para poder
+          cargar toda la data a <a href="https://www.mongodb.com/es">MongoDB</a> se uso la libreria
+          <a href="https://pymongo.readthedocs.io/en/stable/">pymongo</a>. Todo este proceso se realizo creando los parsers
+          que se muestran a continuación.
+        </p>
+        <pre>
+          <code class="language-python">
+            # Codigo para insertar el ruc, la razon social, la condicion del domicilio, el ubigeo y la dirección
+            def parse_sunat_file(self):
+              with open(self.sunat_file, 'r', errors='replace', encoding='UTF-8') as sunat_file:
+                  next(sunat_file)
+                  lines_read = 0
+                  companies = []
+                  print(self.db.name)
+                  for company in sunat_file:
+                      if company[0] != "1":
+                          lines_read += 1
+                          company_data_array = company.split('|')
+                          address = f'{company_data_array[5]} {company_data_array[6]} {company_data_array[9]}'
+                          companies.append({
+                              'ruc': company_data_array[0],
+                              'razon_social': company_data_array[1],
+                              'estado_contribuyente': company_data_array[2],
+                              'condicion_domicilio': company_data_array[3],
+                              'ubigeo': company_data_array[4],
+                              'direccion': address
+                          })
+                  self.db.companiesList.insert_many(companies)
+                  print(f'Cantidad de documentos en la base de datos: {self.db.companiesList.count_documents({})}')
+          </code>
+        </pre>
+        <pre>
+          <code class="language-python">
+            # Codigo para obtener la direccion de las entidades que requieren los contratos y los proveedores, e insertalor
+            # a una base de datos
+            def parse_covid_contract_file(self):
+              data = pd.read_excel(self.covid_contracts_file)
+              df = pd.DataFrame(data, columns=['CODIGOENTIDAD', 'RUC_ENTIDAD', 'ENTIDAD', 'FECHACONVOCATORIA', 'RUCPROVEEDOR',
+                                               'PROVEEDOR', 'RUBROS', 'MONTOREFERENCIALSOLES', 'MONTOADJUDICADOSOLES',
+                                               'ITEMCONVOCA_UNIDADMEDIDA'])
+              result = []
+              for index, row in df.iterrows():
+                  company_data = self.db.companiesList.find_one({'ruc': row['RUCPROVEEDOR']})
+                  company_information = {
+                      'code_entity': row['CODIGOENTIDAD'],
+                      'ruc_entity': row['RUC_ENTIDAD'],
+                      'entity': row['ENTIDAD'],
+                      'competition_date': row['FECHACONVOCATORIA'],
+                      'ruc_provider': row['RUCPROVEEDOR'],
+                      'name_provider': row['PROVEEDOR'],
+                      'heading_provider': row['RUBROS'],
+                      'referential_price': row['MONTOREFERENCIALSOLES'],
+                      'official_price': row['MONTOADJUDICADOSOLES'],
+                      'units': row['ITEMCONVOCA_UNIDADMEDIDA']
+                  }
+                  if company_data:
+                      company_information['ubigeo_provider'] = company_data['ubigeo']
+                      company_information['address_prodiver'] = company_data['direccion']
+                      result.append(company_information)
+                  else:
+                      company_information['ubigeo_provider'] = '0'
+                      company_information['address_prodiver'] = '- - -'
+                      result.append(company_information)
+                  print(index)
+
+              if len(result) > 0:
+                  self.db.contractData.insert_many(result)
+                  print(self.db.contractData.count_documents({}))
+          </code>
+        </pre>
+        <h2 id="geographic-data">2.2. Obtener de datos de geográficos</h2>
+        <p>
+          Primero se cruzo la data de el ruc de las empresas y las entidades contratantes, con el padron de intituciones que
+          se obtuvo de la sunat, para poder obtener una dirección. A continuación usuando la libreria
+          <a href="https://nominatim.org/">Nominatim</a> se obtuvo las latitudes y longitudes de las
+          entidades que realizaron el contrato y de las empresas proveedoras del servicio. Tal como se ven en los snippets
+          de codigo.
+        </p>
+        <pre>
+          <code class="language-python">
+            # Codigo para obtener la latitud y longitud de los proveedores
+            def get_location_from_provider(self):
+                cursor = self.db.contractData
+                result = []
+                exclude_companies = []
+                document_count = 0
+                for document in cursor.find():
+                    document_count += 1
+                    print(document_count)
+                    if document['address_prodiver'] != '- - -' and document['ubigeo_provider'] != '0':
+                        location = self.geolocator.geocode(document['address_prodiver'], timeout=None, country_codes=['pe'])
+                        print(location)
+                        company_information = {
+                            'code_entity': document['code_entity'],
+                            'ruc_entity': document['ruc_entity'],
+                            'entity': document['entity'],
+                            'competition_date': document['competition_date'],
+                            'ruc_provider': document['ruc_provider'],
+                            'name_provider': document['name_provider'],
+                            'ubigeo_provider': document['ubigeo_provider'],
+                            'address_prodiver': document['address_prodiver'],
+                            'heading_provider': document['heading_provider'],
+                            'referential_price': document['referential_price'],
+                            'official_price': document['official_price'],
+                            'units': document['units']
+                        }
+                        if location is not None:
+                            company_information['lat'] = location.latitude
+                            company_information['lng'] = location.longitude
+                            result.append(company_information)
+                        else:
+                            company_information['lat'] = 0
+                            company_information['lng'] = 0
+                            exclude_companies.append(company_information)
+
+                if len(result) > 0:
+                    self.db.companiesLocationData.insert_many(result)
+                    print(f'Cantidad de compañias con ubicación: {self.db.companiesLocationData.count_documents({})}')
+
+                if len(exclude_companies) > 0:
+                    self.db.companiesWithNoLocation.insert_many(exclude_companies)
+                    print(f'Cantidad de compañias excluidas: {self.db.companiesWithNoLocation.count_documents({})}')
+          </code>
+        </pre>
+        <pre>
+          <code class="language-python">
+            # Codigo para obtener la latitud y longitud de las entidades
+            def get_location_from_entities(self):
+                cursor = self.db.companiesLocationData
+                result = []
+                exclude_entities = []
+                document_count = 0
+                for document in cursor.find():
+                    document_count += 1
+                    entity_data = self.db.companiesList.find_one({'ruc': str(document['ruc_entity'])})
+                    if entity_data is not None and entity_data['direccion'] != '- - -':
+                        location = self.geolocator.geocode(entity_data['direccion'], timeout=None, country_codes=['pe'])
+                        print(document_count)
+                        company_data = {
+                            'code_entity': document['code_entity'],
+                            'ruc_entity': document['ruc_entity'],
+                            'entity': document['entity'],
+                            'competition_date': document['competition_date'],
+                            'ruc_provider': document['ruc_provider'],
+                            'name_provider': document['name_provider'],
+                            'ubigeo_provider': document['ubigeo_provider'],
+                            'address_prodiver': document['address_prodiver'],
+                            'heading_provider': document['heading_provider'],
+                            'referential_price': document['referential_price'],
+                            'official_price': document['official_price'],
+                            'units': document['units'],
+                            'provider_lat': document['lat'],
+                            'provider_lng': document['lng']
+                        }
+                        if location is not None:
+                            company_data['entity_lat'] = location.latitude
+                            company_data['entity_lng'] = location.longitude
+                            result.append(company_data)
+                        else:
+                            company_data['entity_lat'] = 0
+                            company_data['entity_lng'] = 0
+                            exclude_entities.append(company_data)
+
+                if len(result) > 0:
+                    self.db.fullContractData.insert_many(result)
+                    print(self.db.fullContractData.count_documents({}))
+
+                if len(exclude_entities) > 0:
+                    self.db.noLocationEntity.insert_many(exclude_entities)
+                    print(self.db.noLocationEntity.count_documents({}))
+          </code>
+        </pre>
+
+        <h2 id="legal-rep">2.3. Obtener los representantes legales y deuda coactiva</h2>
+        <p>
+            En este paso se creo un crawler de la pagina de la sunat para poder obtener de manera automatica los datos de
+            todos los representantes legales, tanto de los proveedores como de las entidades usando el numero de RUC de cada
+            una respectivamente. Los datos obtenidos de cada representante legal son:
+        </p>
+        <ul>
+            <li>Número de DNI</li>
+            <li>Nombres y Apellidos</li>
+            <li>Cargo oficial que ocupan en el proveedor o entidad</li>
+            <li>Desde que fecha ocupan ese cargo</li>
+        </ul>
+        <p>
+            Ademas tambien se pudo los datos de las diferentes deudas que tienen las empresas proveedoras con el estado.
+            Los datos obtenidos de las deudas por proveedor son:
+        </p>
+        <ul>
+            <li>Monto de la deuda</li>
+            <li>Fecha</li>
+            <li>Periodo tributario</li>
+            <li>Entidad con la cual se tiene la deuda</li>
+        </ul>
+        <p>
+            El crawler fue creado tal como se ve en el snippet de codigo, usando la libreria
+            <a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">BeautifulSoup</a>.
+        </p>
+        <pre>
+            <code class="language-python">
+                #Crawler para obtener data de la pagina de la sunat
+                class SunatCrawler(DatabaseSettings):
+                    BASE_URL = 'https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/jcrS00Alias'
+
+                    def __init__(self):
+                        super().__init__()
+
+                    def get_html(self, params):
+                        url = f'{self.BASE_URL}?{urllib.parse.urlencode(params)}'
+                        response = requests.post(url, headers={'Content-Length': '0', 'User-Agent': 'PostmanRuntime/7.28.0',
+                                                               'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, br',
+                                                               'Connection': 'keep-alive'})
+
+                        soup = BeautifulSoup(response.text, 'lxml')
+                        if soup.find('tbody') is not None:
+                            table_body = soup.find('tbody').tr.contents
+                            res = []
+                            for child in table_body:
+                                res.append(child.string.lstrip('\r\n').lstrip(' ').rstrip(' '))
+                            res = [x for x in res if x != '']
+                            return res
+                        return []
+
+                    def get_legal_rep_data(self, ruc=20481772550):
+                        params = {
+                            'accion': 'getRepLeg',
+                            'contexto': 'ti-it',
+                            'modo': 1,
+                            'desRuc': 'empresa',
+                            'nroRuc': ruc
+                        }
+
+                        html_data = self.get_html(params)
+
+                        if len(html_data) == 0:
+                            return {}
+
+                        return {
+                                'doc_type': html_data[0],
+                                'doc_number': html_data[1],
+                                'full_name': html_data[2],
+                                'job': html_data[3],
+                                'designation': html_data[4]
+                            }
+
+                    def get_coactive_debt(self, ruc):
+                        params = {
+                            'accion': 'getInfoDC',
+                            'contexto': 'ti-it',
+                            'modo': 1,
+                            'desRuc': 'empresa',
+                            'nroRuc': ruc
+                        }
+
+                        html_data = self.get_html(params)
+                        res = []
+                        if len(html_data) == 0:
+                            return []
+                        for i in range(0, len(html_data)):
+                            if (i+1) % 4 == 0:
+                                res.append({
+                                    'debt_amount': html_data[i-3],
+                                    'tributary_period': html_data[i-2],
+                                    'coactive_date': html_data[i-1],
+                                    'entity_debt': html_data[i]
+                                })
+                        return res
+
+                    def get_entity_provider_data(self):
+                        legal_representation_cursor = self.db.legalRepresentationInformation
+                        contract_list = []
+                        valid_contract_list = []
+                        provider_list = {}
+                        full_contract_document = self.db.fullContractData
+
+                        for document in legal_representation_cursor.find():
+                            print(f"Entity ruc: {document['ruc_entity'] } \n")
+                            print(f"Provider ruc: {document['ruc_provider']} \n")
+                            entity_legal_designation_date = dateparser.parse(document['legal_rep_entity_designation_date'],
+                                                                             date_formats=['%Y-%m-%d'])
+                            provider_legal_designation_date = dateparser.parse(document['legal_rep_provider_designation_date'],
+                                                                               date_formats=['%Y-%m-%d'])
+                            entity_location = full_contract_document.find_one({'ruc_entity': document['ruc_entity']})
+                            provider_location = full_contract_document.find_one({'ruc_provider': str(document['ruc_provider'])})
+                            if entity_location is None or provider_location is None:
+                                continue
+
+                            contract_data = {
+                                'entity_code': document['code_entity'],
+                                'entity_ruc': document['ruc_entity'],
+                                'entity': document['entity'],
+                                'entity_legal_rep_doc_type': document['legal_rep_entity_doc_type'],
+                                'entity_legal_rep_doc_number': document['legal_rep_entity_doc_number'],
+                                'entity_legal_rep_name': document['legal_rep_entity_name'],
+                                'entity_legal_rep_job': document['legal_rep_entity_job'],
+                                'entity_legal_rep_designation_date': entity_legal_designation_date,
+                                'entity_lat': entity_location['entity_lat'],
+                                'entity_lng': entity_location['entity_lng'],
+                                'referential_money': document['referential_money'],
+                                'contract_money': document['contract_money'],
+                                'provider_ruc': document['ruc_provider'],
+                            }
+
+                            provider_data = {
+                                    'provider_ruc': document['ruc_provider'],
+                                    'provider_name': document['name_provider'],
+                                    'provider_legal_rep_doc_type': document['legal_rep_provider_doc_type'],
+                                    'provider_legal_rep_doc_number': document['legal_rep_provider_doc_number'],
+                                    'provider_legal_rep_name': document['legal_rep_provider_name'],
+                                    'provider_legal_rep_job': document['legal_rep_provider_job'],
+                                    'provider_legal_rep_designation_date': provider_legal_designation_date,
+                                    'provider_heading': document['heading_provider'],
+                                    'provider_lat': provider_location['provider_lat'],
+                                    'provider_lng': provider_location['provider_lng'],
+                                    'coactive_debt': self.get_coactive_debt(document['ruc_provider'])
+                                }
+                            if document['ruc_provider'] not in provider_list.keys():
+                                provider_list[document['ruc_provider']] = provider_data
+
+                            valid_contract_data = {
+                                **contract_data,
+                                **provider_data
+                            }
+
+                            contract_list.append(contract_data)
+                            valid_contract_list.append(valid_contract_data)
+
+                        self.db.contracts.insert_many(contract_list)
+                        self.db.providerDocument.insert_many(list(provider_list.values()))
+                        self.db.validContractData.insert_many(valid_contract_list)
+
+                    def get_all_legal_rep(self):
+                        cursor = self.db.fullContractData
+                        res = []
+                        count = 0
+                        for document in cursor.find():
+                            entity_legal = self.get_legal_rep_data(int(document['ruc_entity']))
+                            provider_legal = self.get_legal_rep_data(int(document['ruc_provider']))
+                            count += 1
+
+                            if bool(entity_legal) and bool(provider_legal):
+                                res.append({
+                                    'code_entity': document['code_entity'],
+                                    'ruc_entity': document['ruc_entity'],
+                                    'entity': document['entity'],
+                                    'legal_rep_entity_doc_type': entity_legal['doc_type'],
+                                    'legal_rep_entity_doc_number': entity_legal['doc_number'],
+                                    'legal_rep_entity_name': entity_legal['full_name'],
+                                    'legal_rep_entity_job': entity_legal['job'],
+                                    'legal_rep_entity_designation_date': entity_legal['designation'],
+                                    'ruc_provider': document['ruc_provider'],
+                                    'name_provider': document['name_provider'],
+                                    'legal_rep_provider_doc_type': provider_legal['doc_type'],
+                                    'legal_rep_provider_doc_number': provider_legal['doc_number'],
+                                    'legal_rep_provider_name': provider_legal['full_name'],
+                                    'legal_rep_provider_job': provider_legal['job'],
+                                    'legal_rep_provider_designation_date': provider_legal['designation'],
+                                    'heading_provider': document['heading_provider'],
+                                    'referential_money': document['referential_price'],
+                                    'contract_money': document['official_price']
+                                })
+
+                                print(f'Registro: {count}')
+
+                        if len(res) > 0:
+                            print(len(res))
+                            self.db.legalRepresentationInformation.insert_many(res)
+
+            </code>
+        </pre>
+        <h2 id="visualization">2.4 Visualización</h2>
+        <p>Con la data ya organizada la data se han obtenido las siguientes visualizaciones</p>
+        <h3>2.4.1 Contidad de contratos por departamento</h3>
+        <iframe class="visualization-frame" src="visualizations/number_of_contracts_per_departemnt.html"></iframe>
+        <h4>2.4.1.1 Cantidad de electores Hábiles en Peru año 2021</h4>
+        <div class='tableauPlaceholder' id='viz1625958651013' style='position: relative;width: 50%;'>
+            <noscript>
+                <a href='#'>
+                    <img alt='Mapa Electoral - Electores Habiles ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ma&#47;MapaElectoral-ElectoresHabiles-2daVuelta-2021&#47;MapaElectoral-ElectoresHabiles&#47;1_rss.png' style='border: none' />
+                </a>
+            </noscript>
+            <object class='tableauViz'  style='display:none;'>
+                <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                <param name='embed_code_version' value='3' />
+                <param name='site_root' value='' />
+                <param name='name' value='MapaElectoral-ElectoresHabiles-2daVuelta-2021&#47;MapaElectoral-ElectoresHabiles' />
+                <param name='tabs' value='no' />
+                <param name='toolbar' value='yes' />
+                <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ma&#47;MapaElectoral-ElectoresHabiles-2daVuelta-2021&#47;MapaElectoral-ElectoresHabiles&#47;1.png' />
+                <param name='animate_transition' value='yes' />
+                <param name='display_static_image' value='yes' />
+                <param name='display_spinner' value='yes' />
+                <param name='display_overlay' value='yes' />
+                <param name='display_count' value='yes' />
+                <param name='language' value='es-ES' />
+            </object>
+        </div>
+        <h3>2.4.2 Relacion entre proveedores y contratos</h3>
+        <h4 class="text-center">Top 11 de Compañias que recibieron mas contratos</h4>
+        <img class="image-chart" src="images/number_of_contract_per_company.png">
+        <br />
+        <h4 class="text-center">Cantidad de proveedores por departamento</h4>
+        <iframe class="visualization-frame" src="visualizations/number_of_companies_by_location.html"></iframe>
+
+        <h3>2.4.3 Cantidad de Entidades que realizaron mas contratos</h3>
+        <h4 class="text-center">Entidades que requirieron mas contratos</h4>
+        <img class="image-chart" src="images/entities_with_more_contracts.png">
+        <br />
+        <h4 class="text-center">Cantidad de entidades por departamento</h4>
+        <iframe class="visualization-frame" src="visualizations/number_of_entities_by_location.html"></iframe>
+
+        <h3>2.4.4 Rubros donde se invirtio mas</h3>
+        <img class="image-chart" src="images/top_11_of_headers.png">
+
+        <h3>2.4.5 Arc Map entre las entidades y sus proveedores</h3>
+        <iframe class="visualization-frame" src="visualizations/entity_provider_arc_map.html"></iframe>
+
+        <h3>2.4.5 Arc Map entre las entidades y proveedores con deuda coactiva</h3>
+        <iframe class="visualization-frame" src="visualizations/entity_provider_debt_arc_layer.html"></iframe>
+
+        <h3>2.4.6 Cantidad total de deuda coactiva por empresa</h3>
+        <div class='tableauPlaceholder' id='viz1625857280693' style='position: relative;width: 50%;'>
+            <noscript>
+                <a href='#'>
+                    <img alt='Empresas con mas deuda Coactiva  ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Co&#47;ContractosCovid2021&#47;EmpresasconmasdeudaCoactiva&#47;1_rss.png' style='border: none' />
+                </a>
+            </noscript>
+            <object class='tableauViz'  style='display:none;'>
+                <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                <param name='embed_code_version' value='3' />
+                <param name='site_root' value='' />
+                <param name='name' value='ContractosCovid2021&#47;EmpresasconmasdeudaCoactiva' />
+                <param name='tabs' value='no' />
+                <param name='toolbar' value='yes' />
+                <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Co&#47;ContractosCovid2021&#47;EmpresasconmasdeudaCoactiva&#47;1.png' />
+                <param name='animate_transition' value='yes' />
+                <param name='display_static_image' value='yes' />
+                <param name='display_spinner' value='yes' />
+                <param name='display_overlay' value='yes' />
+                <param name='display_count' value='yes' />
+                <param name='language' value='es-ES' />
+            </object>
+        </div>
+        <hr />
+        <h1 id="results">Conclusiones</h1>
+        <ol>
+            <li>La ciudad con mayor cantidad de requerimientos de contrato fue Lima, sin embargo ciudades como La Libertad que es la segunda ciudad con mas poblacion del Perú solo tienen 134 solicitudes de contrato</li>
+            <li>Las empresas que tuvieron mayor cantidad de contratos, pertenecen a los rubros de oxigeno, textiles, farmacos e industria medica, sin embargo tambien una empresa del rubro que telecomunicaciones entra en este top </li>
+        </ol>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/highlight.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

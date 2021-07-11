@@ -1,0 +1,16 @@
+main{
+    padding: 0 40px;
+    margin-top: 50px;
+}
+
+.image-chart{
+    margin: 0 auto;
+    display: block;
+}
+
+.visualization-frame{
+    margin: auto;
+    width: 50%;
+    height: 900px;
+    display: block;
+}
